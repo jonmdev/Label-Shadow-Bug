@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.Platform;
 using System.Diagnostics;
 
 namespace Label_Shadow_Bug {
@@ -22,9 +23,12 @@ namespace Label_Shadow_Bug {
                 invokeScreenSizeChangeEvent();
             };
 
-            //VerticalStackLayout vert = new();
-            AbsoluteLayout vert = new();
-            mainPage.Content = vert;
+            AbsoluteLayout abs = new();
+
+            VerticalStackLayout vert = new();
+            mainPage.Content = abs;
+
+            abs.Add(vert);
 
             NestedBorder nestedBorder = new();
             nestedBorder = new();
@@ -35,7 +39,7 @@ namespace Label_Shadow_Bug {
             nestedBorder.innerBorder.BackgroundColor = Colors.Coral;
             nestedBorder.setOuterCornerRadius(12);
             nestedBorder.setOuterPadding(5);
-            vert.Children.Add(nestedBorder);
+            vert.Add(nestedBorder);
 
             Label label = new();
             label.Text = "HELLO WORLD";
@@ -48,6 +52,24 @@ namespace Label_Shadow_Bug {
             label.HorizontalOptions = LayoutOptions.Center;
             nestedBorder.innerBorder.Content = label;
             //vert.Children.Add(label); //moving the label to the vert also fixes the bug
+
+            Label label2 = new();
+            label2.Text = "ALEXANDRA";
+            label2.FontFamily = "NotoSansBold";
+            label2.FontSize = 42;
+            label2.HorizontalOptions = LayoutOptions.Center;
+            label2.TextColor = Colors.White;
+            label2.Margin = new Thickness(0, -5, 0, 10);
+            label2.HandlerChanged += delegate {
+#if ANDROID
+                Android.Views.View androidView = ElementExtensions.ToPlatform(label2, label2.Handler.MauiContext);
+
+                label2.Shadow = new() { Offset = new Point(0, androidView.Context.ToPixels(5)), Radius = androidView.Context.ToPixels(7) };
+#endif
+            };
+            vert.Add(label2);
+
+
 
             //==================
             //RESIZE FUNCTION

@@ -10,6 +10,7 @@ namespace Label_Shadow_Bug {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     fonts.AddFont("Montserrat-Bold.otf", "MontserratBold");
+                    fonts.AddFont("NotoSans-Bold.ttf", "NotoSansBold");
                 });
 
 #if DEBUG
