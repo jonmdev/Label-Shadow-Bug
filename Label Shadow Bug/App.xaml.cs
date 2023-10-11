@@ -34,7 +34,7 @@ namespace Label_Shadow_Bug {
             label.TextColor = Colors.White;
             label.FontSize = 23; //changing font size can fix bug
             label.FontFamily = "MontserratBold";
-            label.Shadow = new() { Offset = new Point(0, 1), Radius = 1, Brush = Colors.Aqua }; //disabling shadow can fix bug
+            label.Shadow = new() { Offset = new Point(0, 1), Radius = 1, Brush = Colors.Aqua }; 
             label.MaxLines = 1;
             label.LineBreakMode = LineBreakMode.NoWrap;
             label.HorizontalOptions = LayoutOptions.Center;
@@ -50,7 +50,7 @@ namespace Label_Shadow_Bug {
             newBorder.HandlerChanged += delegate {
 #if ANDROID
                 Android.Views.View androidView = ElementExtensions.ToPlatform(newBorder, newBorder.Handler.MauiContext);
-                newBorder.Shadow = new() { Offset = new Point(0, androidView.Context.ToPixels(5)), Radius = androidView.Context.ToPixels(4) };
+                newBorder.Shadow = new() { Offset = new Point(0, androidView.Context.ToPixels(5)), Radius = androidView.Context.ToPixels(4) }; //android needs re-scaling of shadows due to other reported bug elsewhere
 #else
                 newBorder.Shadow = new() { Offset = new Point(0, 5), Radius = 4 };
 #endif
@@ -69,7 +69,7 @@ namespace Label_Shadow_Bug {
             label2.HandlerChanged += delegate {
 #if ANDROID
                 Android.Views.View androidView = ElementExtensions.ToPlatform(label2, label2.Handler.MauiContext);
-                label2.Shadow = new() { Offset = new Point(0, androidView.Context.ToPixels(5)), Radius = androidView.Context.ToPixels(7) };
+                label2.Shadow = new() { Offset = new Point(0, androidView.Context.ToPixels(5)), Radius = androidView.Context.ToPixels(7) }; //android needs re-scaling of shadows due to other reported bug elsewhere
 #else
                 label2.Shadow = new() { Offset = new Point(0, 5), Radius = 7 };
 #endif
