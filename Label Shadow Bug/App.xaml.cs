@@ -1,17 +1,57 @@
-﻿using Microsoft.Maui.Controls.Shapes;
+﻿#if ANDROID
+using Android.Content;
+#endif
+using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using System.Diagnostics;
 
 namespace Label_Shadow_Bug {
+#if ANDROID
+    class CMauiTextView: MauiTextView {
+        
+        bool applyFix = false; //TO APPLY TEMP FIX FOR TEXT CLIPPING IN ANDROID, VISIBLE ON PIXEL 5 EMULATOR
+
+        public CMauiTextView(Context context) : base(context) {
+            System.Diagnostics.Debug.WriteLine("CREATE CMAUITEXTVIEW");
+        }
+        protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+            //https://stackoverflow.com/questions/14493732/what-are-widthmeasurespec-and-heightmeasurespec-in-android-custom-views
+
+            var measured = Paint.MeasureText(Text);
+
+            int widthSize = widthMeasureSpec.GetSize();
+            Android.Views.MeasureSpecMode widthMode = widthMeasureSpec.GetMode();
+
+            if (applyFix) {
+                widthSize += 1;
+            }
+
+            int newWidthSpec = Android.Views.View.MeasureSpec.MakeMeasureSpec(widthSize, widthMode);
+
+            var scaledDensity = DeviceDisplay.Current.MainDisplayInfo.Density; //= 2.75 on Pixel 5 emulator
+            System.Diagnostics.Debug.WriteLine("LABEL: " + Text + " ANDROID WIDTH RAW " + + widthSize + " SCALED " + widthSize / scaledDensity);
+
+            base.OnMeasure(newWidthSpec, heightMeasureSpec); 
+        }
+    }
+#endif
     public partial class App : Application {
 
         public event Action screenSizeChanged = null;
         public double screenWidth = 0;
         public double screenHeight = 0;
         ContentPage mainPage;
+
+        
         public App() {
 
-            InitializeComponent();
+#if ANDROID
+            LabelHandler.PlatformViewFactory = (handler) => {
+                return new CMauiTextView(handler.Context); //Create custom MauiTextView for CLabelHandler
+            };
+#endif 
 
             //=========
             //LAYOUT
@@ -58,7 +98,7 @@ namespace Label_Shadow_Bug {
             
             newBorder.Content = label;
             vert.Add(newBorder);
-
+            
             Label label2 = new();
             label2.Text = "ALEXANDRA";
             label2.FontFamily = "NotoSansBold";
@@ -73,6 +113,9 @@ namespace Label_Shadow_Bug {
 #else
                 label2.Shadow = new() { Offset = new Point(0, 5), Radius = 7 };
 #endif
+            };
+            label2.SizeChanged += delegate {
+                Debug.WriteLine("LABEL: " + label2.Text + " SIZE W " + label2.Width + " H " + label2.Height);
             };
             vert.Add(label2);
 
@@ -92,6 +135,8 @@ namespace Label_Shadow_Bug {
                 screenHeight = mainPage.Height;
                 Debug.WriteLine("main page size changed | width: " + screenWidth + " height: " + screenHeight);
                 screenSizeChanged?.Invoke();
+
+                
             }
         }
     }
